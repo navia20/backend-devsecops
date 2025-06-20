@@ -10,6 +10,10 @@ jobs:
   codeql-analysis:
     name: Análisis de Seguridad con CodeQL
     runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
     steps:
       - name: Checkout código
         uses: actions/checkout@v4
