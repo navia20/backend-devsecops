@@ -1,0 +1,51 @@
+name: Pipeline DevSecOps
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  codeql-analysis:
+    name: Análisis de Seguridad con CodeQL
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Instalar dependencias
+        run: npm install --legacy-peer-deps
+      - name: Inicializar CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript
+      - name: Ejecutar análisis CodeQL
+        uses: github/codeql-action/analyze@v3
+
+  build-and-test:
+    name: Build y Test Docker
+    runs-on: ubuntu-latest
+    needs: codeql-analysis
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+      - name: Construir imagen Docker
+        run: docker build -t backend-devsecops:latest .
+      - name: Probar contenedor Docker
+        run: |
+          docker run -d -p 3000:3000 --name test-backend backend-devsecops:latest
+          sleep 10
+          curl -f http://localhost:3000 || (docker logs test-backend && exit 1)
+          docker stop test-backend
+          docker rm test-backend
+      - name: Guardar imagen (opcional)
+        run: docker save backend-devsecops:latest > backend-devsecops-image.tar
+      - name: Subir artefacto Docker
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-image
+          path: backend-devsecops-image.tar
