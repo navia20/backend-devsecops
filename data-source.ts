@@ -1,13 +1,13 @@
-import { DataSource } from 'typeorm';
-import * as dotenv from 'dotenv';
+import { DataSource } from "typeorm";
+import * as dotenv from "dotenv";
 dotenv.config();
-import { User } from './src/users/user.entity';
-import { Note } from './src/notes/note.entity';
+import { User } from "./src/modules/users/entity/user.entity";
+import { Note } from "src/modules/notes/entity/note.entity";
 
 export const AppDataSource = new DataSource({
-  type: 'postgres',
+  type: "postgres",
   url: process.env.database_url,
   entities: [User, Note],
-  migrations: ['src/migrations/*.ts'],
+  migrations: ["src/migrations/*.ts"],
   synchronize: false,
 });
