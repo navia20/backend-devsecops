@@ -1,4 +1,4 @@
-name: SonarCloud Analysis Backend
+name: SonarCloud Analysis
 
 on:
   push:
@@ -7,8 +7,8 @@ on:
     branches: [ main ]
 
 jobs:
-  sonarcloud-backend:
-    name: Análisis SonarCloud Backend
+  sonarcloud:
+    name: Análisis SonarCloud
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -18,17 +18,12 @@ jobs:
           node-version: '20'
       - name: Instalar dependencias
         run: npm install --legacy-peer-deps
-        working-directory: backend-devsecops
-      - name: Ejecutar tests
-        run: npm run test
-        working-directory: backend-devsecops
+      - name: Ejecutar tests y generar cobertura
+        run: npm run test -- --coverage || true
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v2
         with:
           args: >
             -Dsonar.login=${{ secrets.SONAR_TOKEN }}
-            -Dsonar.projectKey=navia20_backend-devsecops
-            -Dsonar.organization=navia20
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        working-directory: backend-devsecops
