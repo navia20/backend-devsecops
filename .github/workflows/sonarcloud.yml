@@ -25,5 +25,7 @@ jobs:
         with:
           args: >
             -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+            -Dsonar.projectKey=navia20_backend-devsecops
+            -Dsonar.organization=navia20
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
